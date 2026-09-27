@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnostic des obstructions nasales — Dr Wed El Abed</title>
+<style>
+/* ============================================================
+   TOKENS — identité éditoriale médicale
+   Modifier les couleurs ici uniquement.
+   ============================================================ */
+:root{
+  --paper:#ffffff;
+  --ink:#17242f;
+  --ink-soft:#33424e;
+  --muted:#64737e;
+  --faint:#93a1aa;
+  --line:#d9e1e5;
+  --line-soft:#e9eef1;
+  --wash:#f7f9fa;
+  --accent:#0c5a62;          /* teal médical profond — couleur d'accent unique */
+  --accent-deep:#084247;
+  --accent-wash:#eef5f5;
+  --warn:#9d4f27;            /* terre cuite — réservé aux alertes cliniques */
+  --warn-wash:#faf3ee;
+  --serif:"Times New Roman",serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,"Segoe UI",sans-serif;
+  --mono:"SFMono-Regular",Consolas,"Courier New",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#0e141a;}
+body{font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;}
+
+/* ============================================================
+   SCÈNE 1920 × 1080 — mise à l'échelle proportionnelle
+   ============================================================ */
+#stage{
+  position:fixed;left:50%;top:50%;
+  width:1920px;height:1080px;
+  transform-origin:center center;
+}
+
+/* ============================================================
+   DIAPOSITIVES
+   ============================================================ */
+
+.slide{
+  position:absolute;
+  inset:0;
+  width:1920px;
+  height:1080px;
+  background:var(--paper);
+
+  /* Keep every slide present so there is never a black gap */
+  opacity:0;
+  visibility:visible;
+  z-index:0;
+
+  transition:opacity .45s ease;
+
+  display:flex;
+  flex-direction:column;
+  padding:84px 116px 72px 116px;
+}
+
+.slide.active{
+  opacity:1;
+  z-index:1;
+}
+
+@keyframes rise{
+  from{
+    opacity:0;
+    transform:translateY(16px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.slide.active .anim{
+  animation:rise .6s cubic-bezier(.22,.61,.36,1) both;
+  animation-delay:var(--d,0s);
+}
+
+/* ---------- En-tête éditorial ---------- */
+.head{display:flex;align-items:baseline;gap:28px;border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:48px;}
+.head .sec{font-family:var(--mono);font-size:19px;letter-spacing:.14em;color:var(--accent);white-space:nowrap;}
+.head h2{font-family:var(--serif);font-weight:400;font-size:52px;line-height:1.08;color:var(--ink);letter-spacing:-.01em;}
+.head .sub{margin-left:auto;font-size:20px;color:var(--muted);letter-spacing:.04em;white-space:nowrap;padding-bottom:6px;}
+
+.kicker{font-size:19px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:20px;}
+.lead{font-family:var(--serif);font-size:40px;line-height:1.28;color:var(--ink);font-weight:400;}
+.small{font-size:22px;line-height:1.5;color:var(--ink-soft);}
+.tiny{font-size:19px;line-height:1.5;color:var(--muted);}
+em.accent{font-style:normal;color:var(--accent);font-weight:600;}
+
+/* ---------- Listes éditoriales ---------- */
+ul.lines{list-style:none;}
+ul.lines li{
+  position:relative;padding:10px 0 10px 34px;font-size:24px;line-height:1.42;color:var(--ink-soft);
+  border-bottom:1px solid var(--line-soft);
+}
+ul.lines li:last-child{border-bottom:none;}
+ul.lines li::before{content:"";position:absolute;left:4px;top:22px;width:12px;height:2px;background:var(--accent);}
+ul.lines li b{color:var(--ink);font-weight:600;}
+ul.lines.dense li{font-size:22px;padding:7px 0 7px 30px;}
+ul.lines.dense li::before{top:19px;}
+
+/* ---------- Numérotation pédagogique ---------- */
+ol.steps{list-style:none;counter-reset:step;}
+ol.steps li{counter-increment:step;position:relative;padding:0 0 34px 84px;}
+ol.steps li::before{
+  counter-increment:none;
+  content:counter(step,decimal-leading-zero);
+  position:absolute;left:0;top:2px;
+  font-family:var(--serif);font-size:40px;color:var(--accent);line-height:1;
+}
+ol.steps li:not(:last-child)::after{
+  content:"";position:absolute;left:23px;top:56px;bottom:2px;width:1px;background:var(--line);
+}
+ol.steps h4{font-size:25px;font-weight:600;color:var(--ink);margin-bottom:6px;letter-spacing:.01em;}
+ol.steps p{font-size:21px;line-height:1.45;color:var(--muted);}
+
+/* ---------- Panneaux (usage mesuré) ---------- */
+.panel{border:1px solid var(--line);background:var(--wash);padding:34px 38px;}
+.panel.accent{border-left:3px solid var(--accent);}
+.panel.warn{border-left:3px solid var(--warn);background:var(--warn-wash);}
+.panel h5{font-size:19px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:14px;}
+.panel.warn h5{color:var(--warn);}
+.panel p{font-size:22px;line-height:1.5;color:var(--ink-soft);}
+
+/* ---------- Figures & placeholders d'images ---------- */
+.fig{position:relative;border:1px solid var(--line);background:#fff;overflow:hidden;}
+.fig img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;background:#fff;}
+.fig .fig-ph{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:
+    repeating-linear-gradient(45deg,#fbfcfd 0,#fbfcfd 14px,#f4f7f8 14px,#f4f7f8 15px);
+}
+.fig .fig-ph::before{content:"";position:absolute;inset:14px;border:1px dashed #c3ced4;}
+.fig .fig-ph .ph-tag{font-size:15px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);}
+.fig .fig-ph .ph-file{font-family:var(--mono);font-size:20px;color:var(--muted);background:#fff;padding:8px 16px;border:1px solid var(--line);}
+.fig figcaption{
+  position:absolute;left:0;right:0;bottom:0;
+  padding:12px 20px;font-size:17px;color:var(--muted);line-height:1.4;
+  background:rgba(255,255,255,.94);border-top:1px solid var(--line-soft);
+}
+.fig figcaption b{color:var(--accent);font-weight:600;font-family:var(--mono);font-size:15px;letter-spacing:.08em;margin-right:10px;}
+
+/* ---------- Grilles ---------- */
+.cols{display:grid;gap:44px;}
+.cols.c2{grid-template-columns:1fr 1fr;}
+.cols.c2-w{grid-template-columns:1.05fr .95fr;}
+.cols.c3{grid-template-columns:1fr 1fr 1fr;}
+.vcenter{display:flex;flex-direction:column;justify-content:center;}
+
+/* ---------- Tableau clinique ---------- */
+table.cl{border-collapse:collapse;width:100%;}
+table.cl th{
+  text-align:left;font-size:17px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+  font-weight:600;padding:0 18px 14px 0;border-bottom:2px solid var(--accent);
+}
+table.cl td{padding:18px 18px 18px 0;border-bottom:1px solid var(--line);font-size:22px;line-height:1.42;color:var(--ink-soft);vertical-align:top;}
+table.cl td b{color:var(--ink);font-weight:600;}
+table.cl tr:last-child td{border-bottom:none;}
+
+/* ---------- Schéma de flux (mécanisme) ---------- */
+.flow{display:flex;align-items:stretch;gap:0;}
+.flow .node{
+  flex:1;border:1px solid var(--line);background:#fff;padding:24px 22px;text-align:center;
+  display:flex;flex-direction:column;justify-content:center;gap:8px;
+}
+.flow .node h6{font-size:22px;font-weight:600;color:var(--ink);line-height:1.3;}
+.flow .node p{font-size:18px;color:var(--muted);line-height:1.4;}
+.flow .arrow{flex:0 0 56px;align-self:center;text-align:center;color:var(--accent);font-size:30px;font-family:var(--serif);}
+.flow .node.hl{border-color:var(--accent);background:var(--accent-wash);}
+
+/* ---------- Trois colonnes typographiques ---------- */
+.col3{border-top:3px solid var(--ink);padding-top:24px;}
+.col3 h4{font-family:var(--serif);font-size:29px;font-weight:400;margin-bottom:14px;color:var(--ink);}
+.col3 .n{font-family:var(--mono);font-size:17px;color:var(--accent);letter-spacing:.14em;display:block;margin-bottom:12px;}
+.col3 p, .col3 li{font-size:21px;line-height:1.5;color:var(--muted);}
+.col3 ul{list-style:none;}
+.col3 li{padding:6px 0 6px 24px;position:relative;border-bottom:1px solid var(--line-soft);}
+.col3 li::before{content:"";position:absolute;left:0;top:17px;width:9px;height:2px;background:var(--accent);}
+.col3 li:last-child{border-bottom:none;}
+
+/* ---------- Mention discrète en pied de diapo ---------- */
+.footnote{margin-top:auto;padding-top:22px;font-size:18px;color:var(--faint);border-top:1px solid var(--line-soft);}
+
+/* ============================================================
+   DIAPOSITIVE 01 — COUVERTURE (fond blanc)
+   ============================================================ */
+.cover{padding:0;}
+.cover .inner{position:relative;width:100%;height:100%;padding:96px 120px;display:flex;flex-direction:column;}
+.cover .logo-slot{
+  position:absolute;top:64px;right:120px;width:300px;height:130px;
+  border:1px dashed #c3ced4;background:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+}
+.cover .logo-slot span{font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);}
+.cover .logo-slot code{font-family:var(--mono);font-size:17px;color:var(--muted);}
+.cover .logo-slot img{max-width:280px;max-height:110px;object-fit:contain;}
+.cover .course-meta{margin-top:16px;font-family:var(--mono);font-size:20px;letter-spacing:.22em;color:var(--accent);text-transform:uppercase;}
+.cover h1{
+  font-family:var(--serif);font-weight:400;font-size:96px;line-height:1.06;letter-spacing:-.015em;
+  margin-top:130px;max-width:1250px;
+}
+.cover h1 .thin{color:var(--accent);}
+.cover .cover-rule{width:120px;height:3px;background:var(--accent);margin:44px 0 36px 0;}
+.cover .cover-sub{font-size:29px;line-height:1.5;color:var(--muted);max-width:980px;}
+.cover .cover-bottom{margin-top:auto;display:flex;align-items:baseline;border-top:1px solid var(--line);padding-top:28px;}
+.cover .cover-bottom .who{font-size:24px;color:var(--ink);}
+.cover .cover-bottom .who b{font-weight:600;}
+.cover .cover-bottom .year{margin-left:auto;font-family:var(--mono);font-size:20px;color:var(--muted);letter-spacing:.1em;}
+
+/* ---------- Sommaire / intercalaire ---------- */
+.toc{display:grid;grid-template-columns:1fr 1fr;gap:0 80px;margin-top:20px;}
+.toc .item{display:flex;gap:26px;align-items:baseline;padding:26px 0;border-bottom:1px solid var(--line-soft);}
+.toc .item .no{font-family:var(--serif);font-size:34px;color:var(--accent);min-width:64px;}
+.toc .item h4{font-size:28px;font-weight:500;color:var(--ink);}
+.toc .item p{font-size:19px;color:var(--muted);margin-top:4px;}
+
+/* ---------- Mention âge (pastille éditoriale sobre) ---------- */
+.age-tag{
+  display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-size:17px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px;
+}
+.age-tag::before{content:"";width:34px;height:2px;background:var(--accent);}
+
+.presentors{
+  margin-top: 1.6rem;
+  font-family: "Times New Roman", serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  opacity: 0.88;
+}
+
+/* ---------- Deux figures côte à côte ---------- */
+.figpair{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  
+<!-- ==========================================================
+     DIAPOSITIVE 01 — COUVERTURE
+     ========================================================== -->
+<!-- ==========================================================
+     DIAPOSITIVE 01 — COUVERTURE
+     ========================================================== -->
+<section class="slide cover active" id="slide-01">
+  <div class="inner">
+    <div class="logo-slot">
+      <img src="assets/logo_faculte.png" alt="Logo de la faculté" onerror="this.style.display='none'">
+      <span>Emplacement réservé</span>
+      <code>assets/logo_faculte.png</code>
+    </div>
+
+    <div class="course-meta anim" style="--d:.05s">
+      Cours d&rsquo;ORL &nbsp;·&nbsp; 2026 / 2027
+    </div>
+
+    <h1 class="anim" style="--d:.15s">
+      Diagnostic des <span class="thin">obstructions nasales</span>
+    </h1>
+
+    <div class="cover-rule anim" style="--d:.3s"></div>
+
+    <p class="cover-sub anim" style="--d:.4s">
+      De la démarche diagnostique au traitement étiologique, en fonction de l&rsquo;&acirc;ge.
+    </p>
+
+    <div class="presentors anim" style="--d:.45s">
+      <div>Mohammed W. Hammami</div>
+      <div>Sarra N. Ernez</div>
+      <div>Rana Amaidia</div>
+      <div>Mouadh Belgasmi</div>
+      <div>Oumaima Taalouch</div>
+      <div>Ons Haboubi</div>
+    </div>
+
+    <div class="cover-bottom anim" style="--d:.5s">
+      <div class="year">Service d&rsquo;ORL, CHU Farhat Hached, Sousse</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 02 — INTRODUCTION
+     ========================================================== -->
+<section class="slide" id="slide-02">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">01</span><h2>Introduction</h2>
+  </div>
+  <div class="vcenter" style="flex:1;">
+    <p class="lead anim" style="--d:.15s;max-width:1500px;">L&rsquo;obstruction nasale est un motif <em class="accent">fr&eacute;quent de consultation</em> en ORL, chez l&rsquo;enfant comme chez l&rsquo;adulte. C&rsquo;est un <em class="accent">sympt&ocirc;me</em> — un trouble de la perm&eacute;abilit&eacute; nasale — et non une maladie en soi.</p>
+    <div class="cols c2" style="margin-top:64px;align-items:start;">
+      <div class="anim" style="--d:.3s;">
+        <div class="kicker" style="font-size:17px;">Manifestations</div>
+        <ul class="lines">
+          <li>Sensation de <b>nez bouch&eacute;</b></li>
+          <li>Difficult&eacute; &agrave; <b>respirer par le nez</b></li>
+        </ul>
+      </div>
+      <div class="anim" style="--d:.4s;">
+        <div class="kicker" style="font-size:17px;">Causes possibles</div>
+        <ul class="lines">
+          <li>Cause <b>anatomique</b> ou <b>architecturale</b></li>
+          <li>Cause <b>muqueuse</b> ou <b>inflammatoire</b></li>
+          <li>Cause <b>tumorale</b>, b&eacute;nigne ou maligne</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footnote anim" style="--d:.55s">Toute obstruction nasale impose une d&eacute;marche diagnostique structur&eacute;e avant tout traitement.</div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 03 — RAPPEL ANATOMIQUE I
+     ========================================================== -->
+<section class="slide" id="slide-03">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">02</span><h2>Rappel anatomique</h2><span class="sub">Vue coronale</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:1.18/1;">
+      <div class="fig-ph"><span class="ph-tag">Illustration anatomique</span><span class="ph-file">assets/anatomie_01.png</span></div>
+      <img src="assets/anatomie_01.png" alt="Vue coronale des fosses nasales" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 01</b>Vue coronale : sinus, cornets et fosse nasale.</figcaption>
+    </figure>
+    <div>
+      <div class="kicker anim" style="--d:.25s;">Les structures de la fili&egrave;re nasale</div>
+      <ul class="lines anim" style="--d:.35s;">
+        <li><b>Cornet nasal sup&eacute;rieur, moyen et inf&eacute;rieur</b> — en regard de la paroi lat&eacute;rale</li>
+        <li><b>Sinus frontal</b> et <b>cellules ethmo&iuml;dales</b> &agrave; l&rsquo;&eacute;tage sup&eacute;rieur</li>
+        <li><b>Sinus maxillaire</b> de part et d&rsquo;autre des fosses nasales</li>
+        <li><b>Fosse nasale</b> proprement dite, cloison m&eacute;diane</li>
+        <li>Voies <b>naso-lacrymales</b> (sac et canal) en regard de l&rsquo;ethmo&iuml;de</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 04 — RAPPEL ANATOMIQUE II
+     ========================================================== -->
+<section class="slide" id="slide-04">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">02</span><h2>Rappel anatomique</h2><span class="sub">Vue sagittale</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <div>
+      <div class="kicker anim" style="--d:.2s;">Du nez au rhinopharynx</div>
+      <ul class="lines anim" style="--d:.3s;">
+        <li><b>Sinus frontal</b>, <b>bulbe olfactif</b> et <b>lame cribl&eacute;e</b> au toit</li>
+        <li><b>Os propre du nez</b> et <b>cartilage</b> formant la vo&ucirc;te</li>
+        <li><b>Cornet sup&eacute;rieur, moyen et inf&eacute;rieur</b> sur la paroi lat&eacute;rale</li>
+        <li><b>Sinus sph&eacute;no&iuml;dal</b> en arri&egrave;re, sous la sella</li>
+        <li><b>Orifice de la trompe d&rsquo;Eustache</b> au niveau du rhinopharynx</li>
+      </ul>
+      <p class="tiny anim" style="--d:.45s;margin-top:28px;">Les me&acirc;ts nasaux assurent la communication et le drainage des sinus vers les fosses nasales.</p>
+    </div>
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:1.18/1;">
+      <div class="fig-ph"><span class="ph-tag">Illustration anatomique</span><span class="ph-file">assets/anatomie_02.png</span></div>
+      <img src="assets/anatomie_02.png" alt="Vue sagittale des fosses nasales" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 02</b>Vue sagittale : cornets, sinus et trompe d&rsquo;Eustache.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 05 — RAPPEL ANATOMIQUE III (ENDOSCOPIE)
+     ========================================================== -->
+<section class="slide" id="slide-05">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">02</span><h2>Rappel anatomique</h2><span class="sub">Aspect endoscopique</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:1/1;">
+      <div class="fig-ph"><span class="ph-tag">Photographie endoscopique</span><span class="ph-file">assets/anatomie_03.png</span></div>
+      <img src="assets/anatomie_03.png" alt="Endoscopie nasale : cornet inférieur et cloison" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 03</b>Endoscopie : cornet inf&eacute;rieur et cloison nasale.</figcaption>
+    </figure>
+    <div>
+      <p class="lead anim" style="--d:.25s;font-size:34px;max-width:760px;">&Agrave; l&rsquo;endoscopie, la fili&egrave;re nasale repose sur deux rep&egrave;res constants.</p>
+      <ul class="lines anim" style="--d:.35s;margin-top:36px;">
+        <li>Le <b>cornet inf&eacute;rieur</b>, structure de la paroi lat&eacute;rale</li>
+        <li>La <b>cloison nasale</b>, paroi m&eacute;diane osteo-cartilagineuse</li>
+      </ul>
+      <p class="tiny anim" style="--d:.5s;margin-top:30px;">Ces rep&egrave;res guident l&rsquo;exploration endoscopique syst&eacute;matique des fosses nasales.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 06 — PHYSIOLOGIE
+     ========================================================== -->
+<section class="slide" id="slide-06">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">03</span><h2>Physiologie des fosses nasales</h2>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div class="cols c3" style="gap:36px;">
+      <div class="col3 anim" style="--d:.15s;">
+        <span class="n">I.</span><h4>Respiration</h4>
+        <p>Les fosses nasales constituent la <b>voie respiratoire sup&eacute;rieure</b>.</p>
+      </div>
+      <div class="col3 anim" style="--d:.25s;">
+        <span class="n">II.</span><h4>Conditionnement de l&rsquo;air</h4>
+        <p>La muqueuse nasale assure l&rsquo;<b>humidification</b>, le <b>r&eacute;chauffement</b> et l&rsquo;adaptation de l&rsquo;air inspir&eacute;.</p>
+      </div>
+      <div class="col3 anim" style="--d:.35s;">
+        <span class="n">III.</span><h4>&Eacute;puration</h4>
+        <p><b>Mucus et cellules cili&eacute;es</b> assurent ensemble la filtration et l&rsquo;&eacute;limination des particules.</p>
+      </div>
+    </div>
+    <div class="panel accent anim" style="--d:.5s;margin-top:56px;">
+      <h5>Innervation</h5>
+      <p>La sensibilit&eacute; g&eacute;n&eacute;rale d&eacute;pend du <b>nerf trijumeau</b>. L&rsquo;innervation neurov&eacute;g&eacute;tative associe le syst&egrave;me <b>sympathique</b> (vasoconstriction) et <b>parasympathique</b> (vasodilatation, augmentation de la s&eacute;cr&eacute;tion).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 07 — PHYSIOLOGIE : CONSÉQUENCE DE L'OBSTRUCTION
+     ========================================================== -->
+<section class="slide" id="slide-07">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">03</span><h2>Physiologie</h2><span class="sub">Retentissement de l&rsquo;obstruction</span>
+  </div>
+  <div class="vcenter" style="flex:1;">
+    <div class="flow anim" style="--d:.2s;">
+      <div class="node hl"><h6>Obstruction nasale</h6><p>diminution du calibre de la fili&egrave;re nasale</p></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><h6>Respiration buccale</h6><p>contournement de la voie nasale</p></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><h6>Air moins conditionn&eacute;</h6><p>perte d&rsquo;humidification et de r&eacute;chauffement</p></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><h6>S&eacute;cheresse &amp; irritation</h6><p>pharyngo-laryng&eacute;e, gorge s&egrave;che ou irrit&eacute;e, surtout le matin</p></div>
+    </div>
+    <table class="cl anim" style="--d:.4s;margin-top:72px;">
+      <tr>
+        <th style="width:50%;">Obstruction bilat&eacute;rale</th>
+        <th>Obstruction unilat&eacute;rale</th>
+      </tr>
+      <tr>
+        <td>Diminution du calibre des <b>deux</b> fosses nasales &rarr; g&ecirc;ne respiratoire <b>plus importante</b></td>
+        <td>Diminution du calibre d&rsquo;une <b>seule</b> fosse nasale &rarr; g&ecirc;ne g&eacute;n&eacute;ralement <b>moins importante</b></td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 08 — DÉMARCHE DIAGNOSTIQUE : INTERROGATOIRE
+     ========================================================== -->
+<section class="slide" id="slide-08">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">04</span><h2>D&eacute;marche diagnostique</h2><span class="sub">A. Interrogatoire</span>
+  </div>
+  <div class="cols c2" style="flex:1;align-items:start;">
+    <div class="anim" style="--d:.15s;">
+      <div class="kicker" style="font-size:17px;">Terrain &amp; ant&eacute;c&eacute;dents</div>
+      <ul class="lines dense">
+        <li><b>Terrain</b> : &acirc;ge, habitudes, profession</li>
+        <li><b>Ant&eacute;c&eacute;dents</b> personnels ou familiaux : asthme, allergie, chirurgie, trauma</li>
+        <li><b>Environnement</b> : saison, climat, pollution, habitat (humidit&eacute;, literie, animaux), exposition &agrave; des irritants chimiques</li>
+        <li><b>Traitements ant&eacute;rieurs</b> : aspirine / AINS, vasoconstricteurs nasaux</li>
+      </ul>
+    </div>
+    <div class="anim" style="--d:.25s;">
+      <div class="kicker" style="font-size:17px;">Histoire &amp; caract&eacute;ristiques de l&rsquo;obstruction</div>
+      <ul class="lines dense">
+        <li><b>Date et mode de d&eacute;but</b>, facteurs favorisants, &eacute;volution, c&ocirc;t&eacute;</li>
+        <li><b>Dur&eacute;e</b> : aigu&euml; ou chronique (&gt; 3 mois)</li>
+        <li><b>Localisation</b> : unilat&eacute;rale, bilat&eacute;rale ou &agrave; bascule</li>
+        <li><b>Intensit&eacute;</b> : partielle ou totale &mdash; <b>&eacute;volution</b> : constante, par pouss&eacute;es, en crescendo</li>
+        <li><b>R&eacute;ponse</b> ou non au traitement</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footnote anim" style="--d:.4s;">L&rsquo;interrogatoire oriente d&rsquo;embl&eacute;e le diagnostic &eacute;tiologique avant tout examen.</div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 09 — INTERROGATOIRE : SIGNES ASSOCIÉS
+     ========================================================== -->
+<section class="slide" id="slide-09">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">04</span><h2>Interrogatoire</h2><span class="sub">Signes associ&eacute;s &amp; signes indirects</span>
+  </div>
+  <div class="cols c2" style="flex:1;align-items:start;">
+    <div class="anim" style="--d:.15s;">
+      <div class="kicker" style="font-size:17px;">Signes associ&eacute;s &mdash; &agrave; rechercher syst&eacute;matiquement</div>
+      <ul class="lines">
+        <li><b>Anosmie</b></li>
+        <li><b>Rhinorrh&eacute;e</b></li>
+        <li><b>&Eacute;ternuements</b></li>
+        <li><b>Douleur</b></li>
+        <li><b>&Eacute;pistaxis</b></li>
+      </ul>
+    </div>
+    <div class="anim" style="--d:.25s;">
+      <div class="kicker" style="font-size:17px;">Signes indirects d&rsquo;obstruction</div>
+      <ul class="lines dense">
+        <li>S&eacute;cheresse buccale, toux s&egrave;che, douleurs pharyng&eacute;es</li>
+        <li>Trach&eacute;o-bronchites r&eacute;p&eacute;t&eacute;es</li>
+        <li>Catarrhe tubaire chronique</li>
+        <li>Ronflement nocturne</li>
+        <li>Retentissement : sommeil, niveau scolaire, rendement professionnel, sport</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel accent anim" style="--d:.4s;">
+    <h5>Syndrome d&rsquo;hyperr&eacute;activit&eacute; nasale</h5>
+    <p>Association caract&eacute;ristique : <b>obstruction nasale + rhinorrh&eacute;e + &eacute;ternuements</b>.</p>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 10 — EXAMEN PHYSIQUE
+     ========================================================== -->
+<section class="slide" id="slide-10">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">04</span><h2>D&eacute;marche diagnostique</h2><span class="sub">A. Examen physique</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:start;">
+    <ol class="steps anim" style="--d:.15s;">
+      <li><h4>Inspection</h4><p>De la face et de la pyramide nasale : d&eacute;formation, nez d&eacute;vi&eacute; ou enfonc&eacute;, collapsus de la valve nasale &agrave; l&rsquo;inspiration ; &eacute;cchymose, plaie en cas de traumatisme.</p></li>
+      <li><h4>Rhinoscopie ant&eacute;rieure</h4><p>Au sp&eacute;culum nasal : muqueuse, cloison, cornets, m&eacute;ats, contenu des fosses nasales.</p></li>
+      <li><h4>Endoscopie nasale</h4><p>Optique rigide ou nasofibroscopie, apr&egrave;s r&eacute;traction de la muqueuse : exploration d&eacute;taill&eacute;e des fosses nasales et des sinus.</p></li>
+      <li><h4>Reste de l&rsquo;examen ORL</h4><p>Otoscopie, examen bucco-oro-pharyng&eacute;, aires ganglionnaires.</p></li>
+    </ol>
+    <div class="anim" style="--d:.3s;">
+      <div class="panel">
+        <h5>Ce que l&rsquo;on recherche &agrave; la rhinoscopie</h5>
+        <ul class="lines dense" style="margin-top:6px;">
+          <li>Muqueuse : <b>rouge vif</b> &rarr; inflammation ; <b>violac&eacute;e</b> &rarr; allergie ; <b>p&acirc;le / atrophique</b> &rarr; rhinite atrophique</li>
+          <li>Cloison : d&eacute;viation, d&eacute;formation, tum&eacute;faction</li>
+          <li>Cornets : hypertrophie ou atrophie</li>
+          <li>S&eacute;cr&eacute;tions purulentes &rarr; sinusite ; polypes, masses bourgeonnantes</li>
+          <li>Bombement r&eacute;nitent de la cloison &rarr; h&eacute;matome septal = <b style="color:var(--warn);">urgence</b></li>
+        </ul>
+      </div>
+      <p class="tiny anim" style="--d:.4s;margin-top:24px;">Palpation : douleur &rarr; traumatisme / inflammation ; mobilit&eacute; anormale &rarr; origine traumatique ; douleur des points sinusiens &rarr; sinusite.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 11 — EXAMENS COMPLÉMENTAIRES
+     ========================================================== -->
+<section class="slide" id="slide-11">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">04</span><h2>D&eacute;marche diagnostique</h2><span class="sub">B. Examens compl&eacute;mentaires</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div class="cols c2" style="align-items:stretch;">
+      <div class="anim" style="--d:.15s;">
+        <div class="kicker" style="font-size:17px;">Confirmer l&rsquo;obstruction</div>
+        <ul class="lines">
+          <li><b>Rhinomanom&eacute;trie</b> : mesure simultan&eacute;e du d&eacute;bit et des variations de pression du courant a&eacute;rien (ant&eacute;rieure par voie nasale, post&eacute;rieure par voie buccale)</li>
+          <li><b>Rhinom&eacute;trie acoustique</b> : r&eacute;flexion d&rsquo;une impulsion acoustique &mdash; calibre et g&eacute;om&eacute;trie des fosses nasales</li>
+        </ul>
+      </div>
+      <div class="anim" style="--d:.25s;">
+        <div class="kicker" style="font-size:17px;">Rechercher l&rsquo;&eacute;tiologie</div>
+        <ul class="lines">
+          <li><b>Tests cutan&eacute;s</b> et <b>IgE sp&eacute;cifiques</b> si rhinite allergique suspect&eacute;e</li>
+          <li><b>TDM</b> : technique principale d&rsquo;exploration des cavit&eacute;s naso-sinusiennes &mdash; cause tumorale ou architecturale</li>
+          <li><b>IRM</b> : int&eacute;ressante dans la pathologie tumorale</li>
+        </ul>
+      </div>
+    </div>
+    <p class="tiny anim" style="--d:.4s;margin-top:48px;">Cytologie nasale (frottis ou lavage) : la muqueuse nasale normale ne contient pas de polynucl&eacute;aires &eacute;osinophiles. &mdash; Explorations immunoallergiques : prick-test, IgE s&eacute;riques totales (peu sp&eacute;cifiques) et sp&eacute;cifiques (diagnostic d&rsquo;allergie).</p>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 12 — INTERCALAIRE : ÉTIOLOGIES SELON L'ÂGE
+     ========================================================== -->
+<section class="slide" id="slide-12">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05</span><h2>Diagnostic &amp; traitement &eacute;tiologique</h2>
+  </div>
+  <div class="vcenter" style="flex:1;">
+    <p class="lead anim" style="--d:.15s;max-width:1400px;">L&rsquo;&eacute;tiologie d&rsquo;une obstruction nasale se lit d&rsquo;abord <em class="accent">&agrave; travers l&rsquo;&acirc;ge du patient</em>.</p>
+    <div class="toc anim" style="--d:.3s;margin-top:56px;">
+      <div class="item"><span class="no">A.</span><div><h4>Nourrisson &amp; nouveau-n&eacute;</h4><p>Atrésie choanale &mdash; rhinite inflammatoire</p></div></div>
+      <div class="item"><span class="no">B.</span><div><h4>Enfant</h4><p>Corps étranger intranasal &mdash; hypertrophie des végétations adenoïdes</p></div></div>
+      <div class="item"><span class="no">C.</span><div><h4>Adulte &mdash; anomalies architecturales</h4><p>Valve nasale &mdash; septum &mdash; concha bullosa &mdash; rhinites hypertrophiques</p></div></div>
+      <div class="item"><span class="no">C.</span><div><h4>Adulte &mdash; muqueuses &amp; tumorales</h4><p>Rhinosinusites, rhinites chroniques &mdash; tumeurs bénignes, malignes, pseudo-tumeurs</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 13 — NOURRISSON : ATRÉSIE CHOANALE
+     ========================================================== -->
+<section class="slide" id="slide-13">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 A</span><h2>Atrésie choanale</h2><span class="sub">Nourrisson &amp; nouveau-n&eacute;</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:start;">
+    <div>
+      <p class="small anim" style="--d:.15s;"><b>Imperforation choanale</b>, membraneuse ou osseuse, se manifestant d&egrave;s la naissance. Deux tableaux cliniques selon la lat&eacute;ralit&eacute;.</p>
+      <table class="cl anim" style="--d:.25s;margin-top:36px;">
+        <tr><th>Atrésie bilatérale</th><th>Atrésie unilatérale</th></tr>
+        <tr>
+          <td><b style="color:var(--warn);">Urgence thérapeutique</b> : détresse respiratoire aiguë du nouveau-né</td>
+          <td>Tableau <b>moins bruyant</b> et moins sévère, souvent découvert plus tardivement</td>
+        </tr>
+      </table>
+      <p class="tiny anim" style="--d:.4s;margin-top:32px;">Diagnostic confirmé par l&rsquo;endoscopie nasale ; la prise en charge est chirurgicale (perforation de la cloison choanale).</p>
+    </div>
+    <div class="figpair anim" style="--d:.25s;">
+      <figure class="fig" style="aspect-ratio:1/1;">
+        <div class="fig-ph"><span class="ph-tag">Endoscopie</span><span class="ph-file">assets/atresie_01.png</span></div>
+        <img src="assets/atresie_01.png" alt="Atrésie choanale bilatérale" onerror="this.style.display='none'">
+        <figcaption><b>Fig. 04</b>Atr&eacute;sie choanale bilat&eacute;rale.</figcaption>
+      </figure>
+      <figure class="fig" style="aspect-ratio:1/1;">
+        <div class="fig-ph"><span class="ph-tag">Endoscopie</span><span class="ph-file">assets/atresie_02.png</span></div>
+        <img src="assets/atresie_02.png" alt="Atrésie choanale unilatérale gauche" onerror="this.style.display='none'">
+        <figcaption><b>Fig. 05</b>Atr&eacute;sie choanale unilat&eacute;rale gauche.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 14 — NOURRISSON : RHINITE INFLAMMATOIRE
+     ========================================================== -->
+<section class="slide" id="slide-14">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 A</span><h2>Rhinite inflammatoire du nourrisson</h2><span class="sub">Nourrisson &amp; nouveau-n&eacute;</span>
+  </div>
+  <div class="vcenter" style="flex:1;">
+    <p class="lead anim" style="--d:.15s;max-width:1500px;">C&rsquo;est la cause <em class="accent">la plus fr&eacute;quente</em> d&rsquo;obstruction nasale chez le nourrisson.</p>
+    <div class="cols c2" style="margin-top:64px;align-items:start;">
+      <div class="anim" style="--d:.3s;">
+        <div class="kicker" style="font-size:17px;">Tableau clinique</div>
+        <ul class="lines">
+          <li>Donne le <b>m&ecirc;me tableau clinique</b> que l&rsquo;atr&eacute;sie choanale</li>
+          <li>Obstruction nasale, g&ecirc;ne respiratoire, troubles de l&rsquo;alimentation</li>
+        </ul>
+      </div>
+      <div class="anim" style="--d:.4s;">
+        <div class="kicker" style="font-size:17px;">Rhinoscopie ant&eacute;rieure</div>
+        <ul class="lines">
+          <li><b>Hypertrophie des cornets</b>, plaqu&eacute;s contre la cloison</li>
+          <li>Obstruction de la <b>fili&egrave;re nasale</b> en regard</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footnote anim" style="--d:.5s;">L&rsquo;&eacute;vocation devant un nourrisson obstru&eacute; : &eacute;liminer une atr&eacute;sie choanale (bilat&eacute;rale = urgence), puis retenir la rhinite inflammatoire, cause la plus fr&eacute;quente.</div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 15 — ENFANT : CORPS ÉTRANGER
+     ========================================================== -->
+<section class="slide" id="slide-15">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 B</span><h2>Corps étranger intranasal</h2><span class="sub">Enfant</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:1/1;">
+      <div class="fig-ph"><span class="ph-tag">Photographie clinique</span><span class="ph-file">assets/corps_etranger_01.png</span></div>
+      <img src="assets/corps_etranger_01.png" alt="Extraction d'un corps étranger nasal" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 06</b>Corps étranger intranasal chez l&rsquo;enfant.</figcaption>
+    </figure>
+    <div>
+      <ul class="lines anim" style="--d:.25s;">
+        <li>Passe souvent <b>inaper&ccedil;u</b> des parents</li>
+        <li><b>Rhinorrh&eacute;e f&eacute;tide unilat&eacute;rale</b>, parfois purulente ou sanglante, qui <b>ne c&egrave;de pas</b> au traitement m&eacute;dical</li>
+        <li>Pousser l&rsquo;interrogatoire &agrave; la recherche d&rsquo;une notion de corps &eacute;tranger</li>
+        <li><b>Rhinoscopie ant&eacute;rieure</b> apr&egrave;s nettoyage des fosses nasales (lavage, aspiration) : met en &eacute;vidence le corps &eacute;tranger</li>
+      </ul>
+      <div class="panel accent anim" style="--d:.4s;margin-top:34px;">
+        <h5>Traitement</h5>
+        <p>Extraction du corps &eacute;tranger, parfois sous anesth&eacute;sie g&eacute;n&eacute;rale selon le si&egrave;ge et la nature de l&rsquo;objet.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 16 — ENFANT : VÉGÉTATIONS ADÉNOÏDES
+     ========================================================== -->
+<section class="slide" id="slide-16">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 B</span><h2>Hypertrophie des végétations adenoïdes</h2><span class="sub">Enfant</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <div>
+      <div class="kicker anim" style="--d:.2s;">Sympt&ocirc;mes</div>
+      <ul class="lines anim" style="--d:.3s;">
+        <li>Obstruction nasale, <b>respiration buccale</b></li>
+        <li><b>Ronflement</b> et troubles respiratoires du sommeil</li>
+        <li>Hypoacousie / <b>otite s&eacute;romuqueuse</b> : dysfonctionnement de la trompe d&rsquo;Eustache</li>
+      </ul>
+      <div class="panel accent anim" style="--d:.45s;margin-top:34px;">
+        <h5>Diagnostic &amp; traitement</h5>
+        <p>Diagnostic : tableau clinique + imp&eacute;dancem&eacute;trie (nasofibroscopie : visualise directement l&rsquo;obstruction). Traitement : <b>adénoïdectomie</b>.</p>
+      </div>
+    </div>
+    <figure class="fig anim" style="--d:.25s;aspect-ratio:1/1;">
+      <div class="fig-ph"><span class="ph-tag">Nasofibroscopie</span><span class="ph-file">assets/adenoides_01.png</span></div>
+      <img src="assets/adenoides_01.png" alt="Hypertrophie des végétations adénoïdes" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 07</b>Hypertrophie des v&eacute;g&eacute;tations ad&eacute;no&iuml;des.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 17 — ADULTE : ORIENTATION
+     ========================================================== -->
+<section class="slide" id="slide-17">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C</span><h2>Chez l&rsquo;adulte</h2>
+  </div>
+  <div class="vcenter" style="flex:1;">
+    <p class="lead anim" style="--d:.15s;max-width:1400px;">Trois grands ensembles &eacute;tiologiques, du plus fr&eacute;quent au plus redout&eacute;.</p>
+    <div class="cols c3" style="margin-top:64px;gap:36px;">
+      <div class="col3 anim" style="--d:.3s;">
+        <span class="n">I.</span><h4>Anomalies architecturales</h4>
+        <ul><li>Valve nasale</li><li>D&eacute;viation septale</li><li>Concha bullosa</li><li>Rhinites hypertrophiques congestives</li></ul>
+      </div>
+      <div class="col3 anim" style="--d:.4s;">
+        <span class="n">II.</span><h4>Atteintes muqueuses</h4>
+        <ul><li>Rhinosinusites infectieuses</li><li>Rhinites chroniques</li><li>Rhinites sp&eacute;cifiques (hormonale, m&eacute;dicamenteuse, vasomotrice)</li></ul>
+      </div>
+      <div class="col3 anim" style="--d:.5s;">
+        <span class="n">III.</span><h4>Pathologie tumorale</h4>
+        <ul><li>Tumeurs b&eacute;nignes</li><li>Tumeurs malignes</li><li>Pseudo-tumeurs (polypes, mucoc&egrave;les)</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 18 — VALVE NASALE
+     ========================================================== -->
+<section class="slide" id="slide-18">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 1</span><h2>Atteintes de la valve nasale</h2><span class="sub">Anomalies architecturales</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:16/10;">
+      <div class="fig-ph"><span class="ph-tag">Photographie clinique</span><span class="ph-file">assets/valve_nasale_01.png</span></div>
+      <img src="assets/valve_nasale_01.png" alt="Collapsus de la valve nasale à l'inspiration" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 08</b>L&rsquo;&eacute;cartement des narines emp&ecirc;che la fermeture de la valve &agrave; l&rsquo;inspiration.</figcaption>
+    </figure>
+    <div>
+      <ul class="lines anim" style="--d:.25s;">
+        <li>Obstruction <b>inspiratoire</b> avec <b>collapsus de la paroi lat&eacute;rale</b> nasale &agrave; l&rsquo;inspiration</li>
+      </ul>
+      <div class="flow anim" style="--d:.35s;margin-top:34px;flex-direction:column;align-items:stretch;gap:0;">
+        <div class="node hl" style="text-align:left;"><h6>Pression n&eacute;gative inspiratoire</h6></div>
+        <div style="text-align:center;color:var(--accent);font-size:26px;line-height:1;">&darr;</div>
+        <div class="node" style="text-align:left;"><h6>Instabilit&eacute; / collapsus de la valve</h6></div>
+        <div style="text-align:center;color:var(--accent);font-size:26px;line-height:1;">&darr;</div>
+        <div class="node" style="text-align:left;"><h6>Obstruction nasale inspiratoire</h6></div>
+      </div>
+      <div class="panel accent anim" style="--d:.5s;margin-top:30px;">
+        <h5>Traitement</h5>
+        <p>Mesures m&eacute;caniques chez certains patients ; chirurgie en cas d&rsquo;insuffisance structurelle symptomatique.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 19 — SEPTUM NASAL
+     ========================================================== -->
+<section class="slide" id="slide-19">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 1</span><h2>Anomalie du septum nasal</h2><span class="sub">Anomalies architecturales</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:16/10;">
+      <div class="fig-ph"><span class="ph-tag">Schéma</span><span class="ph-file">assets/septum_01.png</span></div>
+      <img src="assets/septum_01.png" alt="Déviation septale avant et après correction" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 09</b>D&eacute;viation septale : avant et apr&egrave;s correction.</figcaption>
+    </figure>
+    <div>
+      <ul class="lines anim" style="--d:.25s;">
+        <li>&Eacute;tiologies : <b>post-traumatiques</b>, d&eacute;veloppementales ou cong&eacute;nitales</li>
+        <li>Obstruction nasale <b>unilat&eacute;rale ou bilat&eacute;rale</b>, g&ecirc;ne respiratoire chronique</li>
+        <li>Peut entra&icirc;ner une <b>sinusite chronique par confinement</b></li>
+      </ul>
+      <div class="panel accent anim" style="--d:.4s;margin-top:34px;">
+        <h5>Traitement</h5>
+        <p><b>Septoplastie</b> (correction fonctionnelle du septum) ; <b>rhinoseptoplastie</b> si d&eacute;formation externe associ&eacute;e.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 20 — CONCHA BULLOSA
+     ========================================================== -->
+<section class="slide" id="slide-20">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 1</span><h2>Concha bullosa</h2><span class="sub">Anomalies architecturales</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:1/1;">
+      <div class="fig-ph"><span class="ph-tag">TDM des sinus</span><span class="ph-file">assets/concha_bullosa_01.png</span></div>
+      <img src="assets/concha_bullosa_01.png" alt="Concha bullosa à la TDM" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 10</b>Pneumatisation du cornet moyen &agrave; la TDM.</figcaption>
+    </figure>
+    <div>
+      <ul class="lines anim" style="--d:.25s;">
+        <li><b>Pneumatisation du cornet nasal moyen</b></li>
+        <li>Souvent <b>asymptomatique</b></li>
+        <li>Diagnostic : <b>TDM</b> des sinus</li>
+      </ul>
+      <div class="panel accent anim" style="--d:.4s;margin-top:34px;">
+        <h5>Conduite &agrave; tenir</h5>
+        <p>La pr&eacute;sence d&rsquo;une concha bullosa n&rsquo;est pas en soi une indication op&eacute;ratoire. Si volumineuse, elle induit une obstruction nasale et indique la chirurgie (turbinectomie ou turbinoplastie, par voie endonasale).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 21 — RHINITES HYPERTROPHIQUES CONGESTIVES
+     ========================================================== -->
+<section class="slide" id="slide-21">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 1</span><h2>Rhinites hypertrophiques congestives</h2><span class="sub">Anomalies architecturales</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div class="cols c2" style="align-items:start;">
+      <div class="anim" style="--d:.15s;">
+        <div class="kicker" style="font-size:17px;">Sémiologie</div>
+        <ul class="lines">
+          <li><b>Congestion de la muqueuse</b> des cornets inf&eacute;rieurs</li>
+          <li>Cornets inf&eacute;rieurs <b>rouges vifs et hypertrophiques</b>, mais <b>mous</b></li>
+          <li>Ils se <b>r&eacute;tractent</b> bien sous l&rsquo;effet de la xyloca&iuml;ne</li>
+          <li>Rechercher <b>syst&eacute;matiquement</b> une &eacute;tiologie (rhinite allergique associ&eacute;e notamment)</li>
+        </ul>
+      </div>
+      <div class="anim" style="--d:.25s;">
+        <div class="kicker" style="font-size:17px;">Traitement</div>
+        <ul class="lines">
+          <li><b>M&eacute;dical</b> : corticoth&eacute;rapie locale, lavages d&rsquo;eau de mer</li>
+          <li><b>Chirurgical</b> en cas d&rsquo;&eacute;chec : r&eacute;duction des cornets inf&eacute;rieurs (turbinoplastie ou turbinectomie)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footnote anim" style="--d:.4s;">L&rsquo;&eacute;panchement muqueux congestif est r&eacute;versible : la chirurgie n&rsquo;intervient qu&rsquo;apr&rsquo;&eacute;chec du traitement m&eacute;dical bien conduit.</div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 22 — RHINOSINUSITES INFECTIEUSES
+     ========================================================== -->
+<section class="slide" id="slide-22">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 2</span><h2>Rhinosinusites infectieuses</h2><span class="sub">Pathologies muqueuses</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <table class="cl anim" style="--d:.15s;">
+      <tr><th style="width:50%;">&Eacute;tiologies</th><th>&Eacute;volution</th></tr>
+      <tr><td>Bact&eacute;riennes &mdash; virales &mdash; mycosiques</td><td>Aigu&euml;s ou chroniques (&gt; 3 mois)</td></tr>
+    </table>
+    <div class="cols c2" style="margin-top:56px;align-items:start;">
+      <div class="anim" style="--d:.3s;">
+        <div class="kicker" style="font-size:17px;">Tableau clinique</div>
+        <ul class="lines">
+          <li><b>Obstruction nasale</b> + <b>rhinorrh&eacute;e purulente</b></li>
+          <li><b>C&eacute;phal&eacute;es</b> accentu&eacute;es en position pench&eacute;e en avant</li>
+        </ul>
+      </div>
+      <div class="anim" style="--d:.4s;">
+        <div class="kicker" style="font-size:17px;">Endoscopie nasale</div>
+        <ul class="lines">
+          <li><b>Pus au niveau des m&eacute;ats</b> &mdash; argument diagnostique direct</li>
+          <li>Permet le pr&eacute;l&egrave;vement bact&eacute;riologique en cas de forme chronique</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 23 — RHINITES CHRONIQUES
+     ========================================================== -->
+<section class="slide" id="slide-23">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 2</span><h2>Rhinites chroniques</h2><span class="sub">Pathologies muqueuses</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <p class="lead anim" style="--d:.15s;max-width:1500px;">Atteintes <em class="accent">non m&eacute;caniques</em> des structures nasales, pr&eacute;sentes au moins <em class="accent">12 semaines par an</em>, cons&eacute;cutives ou non.</p>
+    <div class="cols c2" style="margin-top:60px;align-items:start;">
+      <div class="anim" style="--d:.3s;">
+        <div class="kicker" style="font-size:17px;">Rhinite allergique</div>
+        <ul class="lines">
+          <li>Cause la plus fr&eacute;quente : <b>50 % des rhinites chroniques</b></li>
+          <li>Traitement : <b>cortico&iuml;des locaux</b> / <b>antihistaminiques</b></li>
+        </ul>
+      </div>
+      <div class="anim" style="--d:.4s;">
+        <div class="kicker" style="font-size:17px;">Autres rhinites</div>
+        <ul class="lines">
+          <li>Rhinites <b>hormonales</b></li>
+          <li>Rhinites <b>m&eacute;dicamenteuses</b></li>
+          <li>Rhinites <b>vasomotrices</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 24 — PAPILLOME INVERSÉ
+     ========================================================== -->
+<section class="slide" id="slide-24">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 3</span><h2>Papillome invers&eacute;</h2><span class="sub">Tumeurs b&eacute;nignes</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:1/1;">
+      <div class="fig-ph"><span class="ph-tag">Endoscopie</span><span class="ph-file">assets/papillome_01.png</span></div>
+      <img src="assets/papillome_01.png" alt="Papillome inversé : masse naso-ethmoïdale" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 11</b>Masse polyplo&iuml;de naso-ethmo&iuml;dale unilat&eacute;rale.</figcaption>
+    </figure>
+    <div>
+      <p class="small anim" style="--d:.2s;">Tumeur <b>b&eacute;nigne de l&rsquo;adulte</b>, &agrave; pr&eacute;dominance masculine.</p>
+      <ul class="lines anim" style="--d:.3s;margin-top:26px;">
+        <li>&Agrave; l&rsquo;examen : masse polyplo&iuml;de <b>blanc-gris</b>, surface irr&eacute;guli&egrave;re, si&egrave;ge <b>naso-ethmo&iuml;dal</b>, <b>unilat&eacute;rale</b></li>
+        <li><b>TDM et/ou IRM</b> pour &eacute;valuer l&rsquo;extension locale</li>
+        <li>Traitement <b>chirurgical</b> (endonasal dans la majorit&eacute; des cas)</li>
+      </ul>
+      <div class="panel warn anim" style="--d:.45s;margin-top:30px;">
+        <h5>Caract&eacute;ristiques</h5>
+        <p>Agressivit&eacute; locale &mdash; r&eacute;cidive apr&egrave;s chirurgie &mdash; d&eacute;g&eacute;n&eacute;rescence maligne possible.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 25 — FIBROME NASOPHARYNGIEN
+     ========================================================== -->
+<section class="slide" id="slide-25">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 3</span><h2>Fibrome nasopharyngien</h2><span class="sub">Tumeurs b&eacute;nignes</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:start;">
+    <div class="anim" style="--d:.15s;">
+      <div class="kicker" style="font-size:17px;">Pr&eacute;sentation</div>
+      <ul class="lines">
+        <li>Tumeur b&eacute;nigne <b>rare, tr&egrave;s vascularis&eacute;e</b></li>
+        <li>Touche les <b>gar&ccedil;ons</b> &agrave; l&rsquo;&acirc;ge de la pubert&eacute;</li>
+        <li>Signes : <b>obstruction nasale + &eacute;pistaxis + signes de compression</b></li>
+        <li>Diagnostic : endoscopie nasale</li>
+      </ul>
+    </div>
+    <div class="anim" style="--d:.25s;">
+      <div class="kicker" style="font-size:17px;">Bilan &amp; conduite &agrave; tenir</div>
+      <ul class="lines">
+        <li><b>TDM ou IRM avec injection</b> : tumeur hypervascularis&eacute;e, aspect <b>&laquo; poivre et sel &raquo;</b> pathognomonique</li>
+        <li><b style="color:var(--warn);">Biopsie contre-indiqu&eacute;e</b> (gar&ccedil;on + tumeur qui saigne) : imagerie avant toute biopsie</li>
+        <li>Traitement <b>chirurgical</b> (endonasal ou par voie externe selon l&rsquo;extension), apr&egrave;s bilan d&rsquo;extension complet</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel warn anim" style="--d:.4s;">
+    <h5>Point d&rsquo;alerte</h5>
+    <p>Devant un adolescent avec obstruction nasale et &eacute;pistaxis r&eacute;p&eacute;t&eacute;es : imaginer un fibrome nasopharyngien et <b>ne jamais biopsier</b> avant l&rsquo;imagerie.</p>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 26 — CANCER DU CAVUM
+     ========================================================== -->
+<section class="slide" id="slide-26">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 3</span><h2>Cancer du cavum</h2><span class="sub">Tumeurs malignes</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div class="cols c2" style="align-items:start;">
+      <div class="anim" style="--d:.15s;">
+        <div class="kicker" style="font-size:17px;">Sémiologie</div>
+        <ul class="lines">
+          <li><b>Symptomatologie riche</b>, d&rsquo;appel tardif</li>
+          <li><b>Unilat&eacute;ralit&eacute; +++</b> : obstruction unilat&eacute;rale, rhinorrh&eacute;e, otite s&eacute;romuqueuse, ad&eacute;nopathie</li>
+          <li><b>Endoscopie nasale syst&eacute;matique</b> devant toute unilat&eacute;ralit&eacute;</li>
+        </ul>
+      </div>
+      <div class="anim" style="--d:.25s;">
+        <div class="kicker" style="font-size:17px;">Diagnostic &amp; traitement</div>
+        <ul class="lines">
+          <li>Diagnostic : <b>endoscopie nasale + scanner + ana-path</b> (biopsie)</li>
+          <li>Traitement : <b>radioth&eacute;rapie</b> associ&eacute;e ou non &agrave; la <b>chimioth&eacute;rapie</b> selon le stade</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel accent anim" style="--d:.4s;margin-top:52px;">
+      <h5>Pronostic</h5>
+      <p>Plus le diagnostic est pos&eacute; pr&eacute;cocement, meilleur est le pronostic ; on peut arriver &agrave; une r&eacute;mission.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 27 — CANCERS NASO-SINUSIENS
+     ========================================================== -->
+<section class="slide" id="slide-27">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 3</span><h2>Cancer des fosses nasales et des sinus</h2><span class="sub">Tumeurs malignes</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:start;">
+    <div class="anim" style="--d:.15s;">
+      <div class="kicker" style="font-size:17px;">Clinique</div>
+      <ul class="lines">
+        <li>Obstruction nasale <b>unilat&eacute;rale</b>, augmentant d&rsquo;intensit&eacute; <b>&laquo; en crescendo &raquo;</b> avec le volume tumoral</li>
+        <li>&Agrave; la rhinoscopie : <b>masse suspecte</b> qui saigne au contact</li>
+        <li><b>TDM et IRM</b> : bilan l&eacute;sionnel, stadification</li>
+      </ul>
+      <div class="panel accent anim" style="--d:.35s;margin-top:32px;">
+        <h5>Traitement</h5>
+        <p>Chirurgie, radioth&eacute;rapie, chimioth&eacute;rapie : la s&eacute;quence d&eacute;pend de l&rsquo;ana-path et du stade, d&eacute;cision prise en <b>comit&eacute; pluridisciplinaire</b>.</p>
+      </div>
+    </div>
+    <div class="anim" style="--d:.25s;">
+      <div class="kicker" style="font-size:17px;">Types anatomopathologiques fréquents</div>
+      <table class="cl">
+        <tr><th>Type</th><th>Point clé</th></tr>
+        <tr><td><b>Carcinome &eacute;pidermo&iuml;de</b></td><td>Le plus fr&eacute;quent</td></tr>
+        <tr><td><b>Ad&eacute;nocarcinome de l&rsquo;ethmo&iuml;de</b></td><td>Facteur de risque : exposition professionnelle aux <b>poussi&egrave;res de bois</b></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 28 — POLYPOSE NASO-SINUSIENNE
+     ========================================================== -->
+<section class="slide" id="slide-28">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 3</span><h2>Polypose naso-sinusienne</h2><span class="sub">Pseudo-tumeurs</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:1/1;">
+      <div class="fig-ph"><span class="ph-tag">Endoscopie</span><span class="ph-file">assets/polypose_01.png</span></div>
+      <img src="assets/polypose_01.png" alt="Polypes nasaux à l'endoscopie" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 12</b>Polypes translucides comblant les deux fosses nasales.</figcaption>
+    </figure>
+    <div>
+      <p class="small anim" style="--d:.2s;">D&eacute;g&eacute;n&eacute;rescence &oelig;d&eacute;mateuse <b>bilat&eacute;rale b&eacute;nigne</b>, de point de d&eacute;part <b>ethmo&iuml;dal ant&eacute;rieur</b>.</p>
+      <ul class="lines anim" style="--d:.3s;margin-top:24px;">
+        <li>Clinique : <b>obstruction nasale + rhinorrh&eacute;e claire + troubles de l&rsquo;odorat</b></li>
+        <li>Endoscopie : polypes translucides comblant les deux fosses &mdash; pathologie <b>bilat&eacute;rale</b></li>
+        <li>Scanner : utile lorsqu&rsquo;une chirurgie est envisag&eacute;e (comblement ethmo&iuml;do-nasal bilat&eacute;ral)</li>
+      </ul>
+      <div class="panel warn anim" style="--d:.45s;margin-top:28px;">
+        <h5>Association &agrave; rechercher</h5>
+        <p><b>Asthme + intol&eacute;rance &agrave; l&rsquo;aspirine + polypose</b> = syndrome de Widal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 29 — POLYPOSE : TRAITEMENT
+     ========================================================== -->
+<section class="slide" id="slide-29">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 3</span><h2>Polypose naso-sinusienne</h2><span class="sub">Traitement</span>
+  </div>
+  <div class="cols c2" style="flex:1;align-items:start;">
+    <div class="anim" style="--d:.15s;">
+      <div class="kicker" style="font-size:17px;">Traitement médical — toujours en première intention</div>
+      <ul class="lines">
+        <li><b>Corticoth&eacute;rapie locale quotidienne</b></li>
+        <li>&plusmn; corticoth&eacute;rapie g&eacute;n&eacute;rale en <b>cure courte</b> (max. 3 cures / an)</li>
+        <li><b>Antibioth&eacute;rapie</b> en cas de surinfection</li>
+      </ul>
+    </div>
+    <div class="anim" style="--d:.25s;">
+      <div class="kicker" style="font-size:17px;">Traitement chirurgical</div>
+      <ul class="lines">
+        <li>Indiqu&eacute; en cas d&rsquo;<b>&eacute;chec du traitement m&eacute;dical</b> ou de polypose &eacute;volu&eacute;e</li>
+        <li>Le geste : <b>&eacute;videment ethmo&iuml;dal par voie endonasale</b></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footnote anim" style="--d:.4s;">La chirurgie n&rsquo;exclut pas la corticoth&eacute;rapie post-op&eacute;ratoire : la maladie polypeuse reste chronique.</div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 30 — POLYPE DE KILIAN
+     ========================================================== -->
+<section class="slide" id="slide-30">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 3</span><h2>Polype antro-choanal de Kilian</h2><span class="sub">Pseudo-tumeurs</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <p class="lead anim" style="--d:.15s;max-width:1500px;">D&eacute;g&eacute;n&eacute;rescence &oelig;d&eacute;mateuse de la muqueuse du <em class="accent">sinus maxillaire</em>, en polype qui sort dans la fosse nasale et prolabe dans le cavum.</p>
+    <div class="cols c2" style="margin-top:56px;align-items:start;">
+      <div class="anim" style="--d:.3s;">
+        <div class="kicker" style="font-size:17px;">Diagnostic</div>
+        <ul class="lines">
+          <li>Endoscopie nasale : polype <b>translucide unilat&eacute;ral</b> en bissac, provenant du m&eacute;at moyen</li>
+        </ul>
+      </div>
+      <div class="anim" style="--d:.4s;">
+        <div class="kicker" style="font-size:17px;">Traitement</div>
+        <ul class="lines">
+          <li><b>Chirurgical</b>, par voie endonasale ou mixte endonasale et buccale</li>
+          <li><b style="color:var(--warn);">Pas de place au traitement m&eacute;dical</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 31 — MUCOCÈLES
+     ========================================================== -->
+<section class="slide" id="slide-31">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">05 C · 3</span><h2>Mucoc&egrave;les naso-sinusiennes</h2><span class="sub">Pseudo-tumeurs</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:16/11;">
+      <div class="fig-ph"><span class="ph-tag">TDM du massif facial</span><span class="ph-file">assets/mucocele_01.png</span></div>
+      <img src="assets/mucocele_01.png" alt="Mucocèle du sinus maxillaire gauche à la TDM" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 13</b>Mucoc&egrave;le du sinus maxillaire gauche : image hypodense avec amincissement des parois osseuses.</figcaption>
+    </figure>
+    <div>
+      <ul class="lines anim" style="--d:.25s;">
+        <li><b>Formation pseudokystique</b> remplie de mucus</li>
+        <li>Facteurs : traumatique, inflammatoire, post-chirurgical, polypose, rhinosinusites chroniques, terrain allergique, irradiation, tumeurs</li>
+        <li>Symptomatologie <b>variable selon le sinus atteint</b></li>
+        <li>Diagnostic : essentiellement sur la <b>TDM</b></li>
+        <li>Traitement : <b>uniquement chirurgical</b></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 32 — SYNTHÈSE ICONOGRAPHIQUE
+     ========================================================== -->
+<section class="slide" id="slide-32">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">06</span><h2>Synth&egrave;se iconographique</h2><span class="sub">Endoscopies comparées</span>
+  </div>
+  <div class="cols c2-w" style="flex:1;align-items:center;">
+    <figure class="fig anim" style="--d:.2s;aspect-ratio:16/10;">
+      <div class="fig-ph"><span class="ph-tag">Planche endoscopique</span><span class="ph-file">assets/synthese_endoscopies.png</span></div>
+      <img src="assets/synthese_endoscopies.png" alt="Planche comparative : papillome inversé, polype de Kilian, JNA, adénoïdes" onerror="this.style.display='none'">
+      <figcaption><b>Fig. 14</b>Aspects endoscopiques : papillome invers&eacute;, polype de Kilian, fibrome nasopharyngien, ad&eacute;no&iuml;des.</figcaption>
+    </figure>
+    <div>
+      <p class="lead anim" style="--d:.2s;font-size:33px;max-width:720px;">Quatre aspects endoscopiques &agrave; savoir reconna&icirc;tre, du nourrisson &agrave; l&rsquo;adulte.</p>
+      <ul class="lines anim" style="--d:.35s;margin-top:32px;">
+        <li><b>Papillome invers&eacute;</b> : masse naso-ethmo&iuml;dale unilat&eacute;rale, surface irr&eacute;guli&egrave;re</li>
+        <li><b>Polype de Kilian</b> : polype translucide unilat&eacute;ral en bissac</li>
+        <li><b>Fibrome nasopharyngien</b> : masse du rhinopharynx chez l&rsquo;adolescent, tr&egrave;s vascularis&eacute;e</li>
+        <li><b>Hypertrophie ad&eacute;no&iuml;de</b> : obstruction du rhinopharynx chez l&rsquo;enfant</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     DIAPOSITIVE 33 — CONCLUSION
+     ========================================================== -->
+<section class="slide" id="slide-33">
+  <div class="head anim" style="--d:.05s">
+    <span class="sec">07</span><h2>Conclusion</h2>
+  </div>
+  <div class="vcenter" style="flex:1;">
+    <ul class="lines anim" style="--d:.2s;font-size:26px;">
+      <li style="font-size:27px;">L&rsquo;obstruction nasale est un <b>motif de consultation fr&eacute;quent</b> en ORL, chez l&rsquo;enfant comme chez l&rsquo;adulte</li>
+      <li style="font-size:27px;">C&rsquo;est un sympt&ocirc;me qui impose une <b>d&eacute;marche diagnostique pr&eacute;cise</b> pour aboutir &agrave; un diagnostic &eacute;tiologique</li>
+      <li style="font-size:27px;">L&rsquo;&eacute;tiologie se lit d&rsquo;abord <b>en fonction de l&rsquo;&acirc;ge</b> : nourrisson, enfant, adulte</li>
+      <li style="font-size:27px;">Bien que les causes <b>muqueuses</b> soient les plus fr&eacute;quentes, l&rsquo;<b>endoscopie des fosses nasales et du cavum doit &ecirc;tre syst&eacute;matique</b> pour &eacute;liminer une cause organique, en premier lieu tumorale</li>
+    </ul>
+  </div>
+  <div class="footnote anim" style="--d:.35s">Cours d&rsquo;ORL &mdash; 2026 / 2027</div>
+</section>
+
+</div><!-- /#stage -->
+
+<script>
+/* ============================================================
+   NAVIGATION CLAVIER — aucune interface visible
+   ArrowRight / ArrowDown / Space  → suivante
+   ArrowLeft  / ArrowUp            → précédente
+   Home → première   ·   End → dernière   ·   Esc → sortie plein écran
+   ============================================================ */
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total  = slides.length;
+  var current = 0;
+
+function go(n){
+  if(n < 0) n = 0;
+  if(n > total - 1) n = total - 1;
+  if(n === current) return;
+
+  slides[current].classList.remove('active');
+
+  current = n;
+
+  slides[current].classList.add('active');
+}
+
+  document.addEventListener('keydown', function(e){
+    switch(e.key){
+      case 'ArrowRight':
+      case 'ArrowDown':
+      case ' ':
+      case 'PageDown':
+        e.preventDefault(); go(current + 1); break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+      case 'PageUp':
+        e.preventDefault(); go(current - 1); break;
+      case 'Home':
+        e.preventDefault(); go(0); break;
+      case 'End':
+        e.preventDefault(); go(total - 1); break;
+      case 'Escape':
+        if(document.fullscreenElement){ document.exitFullscreen(); }
+        break;
+    }
+  });
+
+  /* Mise à l'échelle 16:9 (1920 × 1080) */
+  var stage = document.getElementById('stage');
+  function fit(){
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  go(0);
+})();
+</script>
+</body>
+</html>
